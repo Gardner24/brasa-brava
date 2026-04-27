@@ -63,6 +63,7 @@ const PERMISSIONS = {
     'product.read',
     'recipe.read',
     'category.read',
+    'warehouse.read',
     'inventory.read',
     'inventory.move',
     'audit.read',

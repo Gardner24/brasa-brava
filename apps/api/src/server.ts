@@ -22,6 +22,10 @@ import { productRoutes } from './infrastructure/http/routes/product.routes.js';
 import { recipeRoutes } from './infrastructure/http/routes/recipe.routes.js';
 import { categoryRoutes } from './infrastructure/http/routes/category.routes.js';
 import { auditLogRoutes } from './infrastructure/http/routes/audit-log.routes.js';
+import { warehouseRoutes } from './infrastructure/http/routes/warehouse.routes.js';
+import { movementRoutes } from './infrastructure/http/routes/movement.routes.js';
+import { stockRoutes } from './infrastructure/http/routes/stock.routes.js';
+import { alertRoutes } from './infrastructure/http/routes/alert.routes.js';
 
 // Return type intencionalmente inferido — Fastify cambia el tipo del server
 // según las opciones (HTTP/2, etc.) y forzar FastifyInstance genérico genera
@@ -104,6 +108,10 @@ export async function buildServer(env: Env) {
   await app.register(recipeRoutes, { prefix: '/recipes' });
   await app.register(categoryRoutes, { prefix: '/categories' });
   await app.register(auditLogRoutes, { prefix: '/audit-log' });
+  await app.register(warehouseRoutes, { prefix: '/warehouses' });
+  await app.register(movementRoutes, { prefix: '/movements' });
+  await app.register(stockRoutes, { prefix: '/stock' });
+  await app.register(alertRoutes, { prefix: '/alerts' });
 
   await app.ready();
   return app;
