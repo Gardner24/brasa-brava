@@ -7,6 +7,7 @@
     "dashboard": "Home",
     "catalog": "Catalog",
     "recipes": "Recipes",
+    "warehouses": "Warehouses",
     "inventory": "Inventory",
     "audits": "Audits",
     "movements": "Movements",

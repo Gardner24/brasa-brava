@@ -7,6 +7,8 @@ import { Dashboard } from '@/pages/Dashboard.tsx';
 import { CatalogPage } from '@/pages/CatalogPage.tsx';
 import { RecipesPage } from '@/pages/RecipesPage.tsx';
 import { AuditLogPage } from '@/pages/AuditLogPage.tsx';
+import { WarehousesPage } from '@/pages/WarehousesPage.tsx';
+import { InventoryPage } from '@/pages/InventoryPage.tsx';
 
 export function App() {
   return (
@@ -19,6 +21,8 @@ export function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/recipes" element={<RecipesPage />} />
+            <Route path="/warehouses" element={<WarehousesPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/admin/audit-log" element={<AuditLogPage />} />
             <Route path="*" element={<Navigate to="/catalog" replace />} />
           </Route>

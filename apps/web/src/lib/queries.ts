@@ -15,6 +15,12 @@ import type {
   CategoryDTO,
   AuditLogEntryDTO,
   ListAuditLogQuery,
+  WarehouseDTO,
+  StockLevelDTO,
+  StockValuationByCategoryDTO,
+  ListStockQuery,
+  LowStockAlertDTO,
+  ListAlertsQuery,
 } from '@brasa/shared-types';
 import { api } from './api.ts';
 
@@ -28,6 +34,10 @@ export const qk = {
   recipeScale: (id: string, n: number) => ['recipes', id, 'scale', n] as const,
   categories: () => ['categories'] as const,
   auditLog: (q?: Partial<ListAuditLogQuery>) => ['audit-log', q ?? {}] as const,
+  warehouses: () => ['warehouses'] as const,
+  stock: (q: ListStockQuery) => ['stock', q] as const,
+  stockValuation: (warehouseId: string) => ['stock', 'valuation', warehouseId] as const,
+  alerts: (q?: Partial<ListAlertsQuery>) => ['alerts', q ?? {}] as const,
 };
 
 // ===== Helpers =====
@@ -120,5 +130,56 @@ export function useAuditLog(query: Partial<ListAuditLogQuery> = {}) {
     queryKey: qk.auditLog(query),
     queryFn: () => api<Paginated<AuditLogEntryDTO>>(`/audit-log${qs(query)}`),
     placeholderData: keepPreviousData,
+  });
+}
+
+// ===== Warehouses =====
+export function useWarehouses() {
+  return useQuery({
+    queryKey: qk.warehouses(),
+    queryFn: () => api<WarehouseDTO[]>('/warehouses'),
+    staleTime: 30_000,
+  });
+}
+
+// ===== Stock =====
+export function useStock(query: ListStockQuery | undefined) {
+  return useQuery({
+    queryKey: query ? qk.stock(query) : ['stock', 'none'],
+    queryFn: () => api<StockLevelDTO[]>(`/stock${qs(query!)}`),
+    enabled: !!query?.warehouseId,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useStockValuation(warehouseId: string | undefined) {
+  return useQuery({
+    queryKey: warehouseId ? qk.stockValuation(warehouseId) : ['stock', 'valuation', 'none'],
+    queryFn: () => api<StockValuationByCategoryDTO>(`/stock/valuation?warehouseId=${warehouseId}`),
+    enabled: !!warehouseId,
+  });
+}
+
+// ===== Alerts =====
+export function useAlerts(query: Partial<ListAlertsQuery> = {}) {
+  return useQuery({
+    queryKey: qk.alerts(query),
+    queryFn: () => api<Paginated<LowStockAlertDTO>>(`/alerts${qs(query)}`),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResolveAlert() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (args: { id: string; notes?: string }) =>
+      api<void>(`/alerts/${args.id}/resolve`, {
+        method: 'POST',
+        body: JSON.stringify({ notes: args.notes ?? '' }),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['alerts'] });
+      qc.invalidateQueries({ queryKey: ['warehouses'] });
+    },
   });
 }

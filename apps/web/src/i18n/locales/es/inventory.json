@@ -1,0 +1,54 @@
+{
+  "warehouses": {
+    "title": "Almacenes",
+    "subtitle": "Vista general por bodega — items, valor en stock y alertas abiertas",
+    "newWarehouse": "Nuevo almacén",
+    "card": {
+      "items": "Productos",
+      "value": "Valor en stock",
+      "openAlerts": "Alertas abiertas",
+      "viewInventory": "Ver inventario"
+    },
+    "empty": "Aún no hay almacenes registrados.",
+    "inactive": "Inactivo"
+  },
+  "inventory": {
+    "title": "Inventario",
+    "subtitle": "Stock vivo por almacén",
+    "selectWarehouse": "Selecciona un almacén",
+    "filters": {
+      "title": "Filtros",
+      "warehouse": "Almacén",
+      "category": "Categoría",
+      "allCategories": "Todas las categorías",
+      "belowReorderOnly": "Solo bajo punto de reorden",
+      "negativeOnly": "Solo negativos"
+    },
+    "cols": {
+      "sku": "SKU",
+      "name": "Producto",
+      "category": "Categoría",
+      "qty": "Cantidad",
+      "unit": "Unidad",
+      "avgUnitCost": "Costo prom.",
+      "totalValue": "Valor",
+      "reorderPoint": "Reorden",
+      "daysCoverage": "Días cobertura",
+      "status": "Estado"
+    },
+    "status": {
+      "ok": "OK",
+      "low": "Bajo",
+      "negative": "Negativo",
+      "noData": "Sin datos"
+    },
+    "valuation": {
+      "title": "Valorización por categoría",
+      "grandTotal": "Total general",
+      "items": "items"
+    },
+    "empty": "Este almacén no tiene productos con stock registrado todavía.",
+    "noCoverage": "—",
+    "registerMovement": "Registrar movimiento"
+  }
+}

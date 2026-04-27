@@ -11,11 +11,13 @@ import esDashboard from './locales/es/dashboard.json';
 import esCatalog from './locales/es/catalog.json';
 import esRecipes from './locales/es/recipes.json';
 import esAudit from './locales/es/audit.json';
+import esInventory from './locales/es/inventory.json';
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
 import enCatalog from './locales/en/catalog.json';
 import enRecipes from './locales/en/recipes.json';
 import enAudit from './locales/en/audit.json';
+import enInventory from './locales/en/inventory.json';
 
 export const SUPPORTED_LOCALES = ['es', 'en'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -26,7 +28,7 @@ void i18next
   .init({
     fallbackLng: 'es',
     supportedLngs: SUPPORTED_LOCALES as unknown as string[],
-    ns: ['common', 'dashboard', 'catalog', 'recipes', 'audit'],
+    ns: ['common', 'dashboard', 'catalog', 'recipes', 'audit', 'inventory'],
     defaultNS: 'common',
     detection: {
       order: ['localStorage', 'navigator'],
@@ -41,6 +43,7 @@ void i18next
         catalog: esCatalog,
         recipes: esRecipes,
         audit: esAudit,
+        inventory: esInventory,
       },
       en: {
         common: enCommon,
@@ -48,6 +51,7 @@ void i18next
         catalog: enCatalog,
         recipes: enRecipes,
         audit: enAudit,
+        inventory: enInventory,
       },
     },
   });

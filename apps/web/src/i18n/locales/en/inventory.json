@@ -1,0 +1,54 @@
+{
+  "warehouses": {
+    "title": "Warehouses",
+    "subtitle": "Overview by warehouse — items, stock value and open alerts",
+    "newWarehouse": "New warehouse",
+    "card": {
+      "items": "Products",
+      "value": "Stock value",
+      "openAlerts": "Open alerts",
+      "viewInventory": "View inventory"
+    },
+    "empty": "No warehouses registered yet.",
+    "inactive": "Inactive"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Live stock by warehouse",
+    "selectWarehouse": "Select a warehouse",
+    "filters": {
+      "title": "Filters",
+      "warehouse": "Warehouse",
+      "category": "Category",
+      "allCategories": "All categories",
+      "belowReorderOnly": "Below reorder point only",
+      "negativeOnly": "Negative only"
+    },
+    "cols": {
+      "sku": "SKU",
+      "name": "Product",
+      "category": "Category",
+      "qty": "Qty",
+      "unit": "Unit",
+      "avgUnitCost": "Avg. cost",
+      "totalValue": "Value",
+      "reorderPoint": "Reorder",
+      "daysCoverage": "Coverage (days)",
+      "status": "Status"
+    },
+    "status": {
+      "ok": "OK",
+      "low": "Low",
+      "negative": "Negative",
+      "noData": "No data"
+    },
+    "valuation": {
+      "title": "Valuation by category",
+      "grandTotal": "Grand total",
+      "items": "items"
+    },
+    "empty": "This warehouse has no stock recorded yet.",
+    "noCoverage": "—",
+    "registerMovement": "Register movement"
+  }
+}
