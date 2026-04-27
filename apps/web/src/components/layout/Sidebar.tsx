@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,7 +14,14 @@ import {
 import { cn } from '@/lib/cn.ts';
 import { BrandMark } from '@/components/branding/BrandMark.tsx';
 
-const items = [
+interface NavItem {
+  key: string;
+  icon: LucideIcon;
+  to: string;
+  disabled?: boolean;
+}
+
+const items: NavItem[] = [
   { key: 'dashboard', icon: LayoutDashboard, to: '/dashboard' },
   { key: 'catalog', icon: Package, to: '/catalog' },
   { key: 'recipes', icon: ScrollText, to: '/recipes' },
@@ -21,11 +29,11 @@ const items = [
   { key: 'audits', icon: ClipboardCheck, to: '/audits', disabled: true },
   { key: 'movements', icon: ArrowLeftRight, to: '/movements', disabled: true },
   { key: 'alerts', icon: BellRing, to: '/alerts', disabled: true },
-] as const;
+];
 
-const adminItems = [
+const adminItems: NavItem[] = [
   { key: 'auditLog', icon: History, to: '/admin/audit-log' },
-] as const;
+];
 
 export function Sidebar() {
   const { t } = useTranslation();

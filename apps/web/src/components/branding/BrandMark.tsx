@@ -25,9 +25,12 @@ export function BrandMark({
   textClassName,
 }: Props) {
   const s = SIZES[size];
+  // Con exactOptionalPropertyTypes:true, debemos omitir `style` cuando no
+  // hay color en lugar de pasar `undefined`. Spread condicional logra eso.
+  const flameStyle = flameColor ? { style: { color: flameColor } } : {};
   return (
     <div className={cn('flex items-center gap-3', className)}>
-      <Flame className={cn(s.flame, !flameColor && 'text-brand')} style={flameColor ? { color: flameColor } : undefined} />
+      <Flame className={cn(s.flame, !flameColor && 'text-brand')} {...flameStyle} />
       <div className={textClassName}>
         <p className={cn('font-display font-medium leading-none', s.title)}>Brasa Brava</p>
         {!compact && (

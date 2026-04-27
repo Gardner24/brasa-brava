@@ -133,9 +133,19 @@ CREATE POLICY tenant_isolation ON audit_log
 -- ===== Inmutabilidad de audit_log ============================
 -- Revocamos UPDATE y DELETE al rol de aplicación: ni un bug puede
 -- alterar el rastro. INSERT y SELECT permanecen.
+-- El bloqueo a PUBLIC siempre se aplica.
 REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM PUBLIC;
-REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM brasa_app;
-GRANT  SELECT, INSERT ON audit_log TO brasa_app;
+
+-- Los grants/revokes específicos a brasa_app solo si el rol existe
+-- (en CI puede no haberse creado vía init.sql).
+DO $do$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'brasa_app') THEN
+    REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM brasa_app;
+    GRANT  SELECT, INSERT ON audit_log TO brasa_app;
+  END IF;
+END
+$do$;
 
 -- Trigger defensivo adicional: aunque alguien haga GRANT por error,
 -- cualquier UPDATE/DELETE en audit_log explota.
