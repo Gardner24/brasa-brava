@@ -1,6 +1,16 @@
 import { z } from 'zod';
 import { Bilingual, UUID } from './common.js';
 
+/**
+ * Boolean en query string. NO usar z.coerce.boolean() porque convierte
+ * "false" en true (Boolean("false") === true). Este preprocesa los strings
+ * literales "true" / "false" antes de validar.
+ */
+const QueryBoolean = z.preprocess(
+  (v) => (v === 'true' ? true : v === 'false' ? false : v),
+  z.boolean(),
+);
+
 export const MovementType = z.enum([
   'PURCHASE',
   'CONSUMPTION',
@@ -134,8 +144,8 @@ export type StockLevelDTO = z.infer<typeof StockLevelDTO>;
 export const ListStockQuery = z.object({
   warehouseId: UUID,
   categoryCode: z.string().optional(),
-  belowReorderOnly: z.coerce.boolean().optional(),
-  negativeOnly: z.coerce.boolean().optional(),
+  belowReorderOnly: QueryBoolean.optional(),
+  negativeOnly: QueryBoolean.optional(),
 });
 export type ListStockQuery = z.infer<typeof ListStockQuery>;
 
@@ -173,7 +183,7 @@ export type LowStockAlertDTO = z.infer<typeof LowStockAlertDTO>;
 
 export const ListAlertsQuery = z.object({
   warehouseId: UUID.optional(),
-  resolved: z.coerce.boolean().optional(), // default: solo no-resueltas
+  resolved: QueryBoolean.optional(), // default: solo no-resueltas
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(50),
 });
