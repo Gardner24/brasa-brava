@@ -1,0 +1,17 @@
+{
+  "title": "Recetas",
+  "searchPlaceholder": "Buscar receta...",
+  "linesCount": "{{count}} ingredientes",
+  "emptyState": "Selecciona una receta para ver su escandallo",
+  "yield": "Rinde {{qty}} {{unit}}",
+  "costPerPortion": "Costo por porción",
+  "incompleteCost": "Costo incompleto",
+  "instructions": "Indicaciones",
+  "cols": {
+    "ingredient": "Ingrediente",
+    "qty": "Cantidad",
+    "unit": "Unidad",
+    "unitCost": "Costo unit.",
+    "lineCost": "Costo línea"
+  }
+}

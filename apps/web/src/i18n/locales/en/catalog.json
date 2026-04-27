@@ -1,0 +1,30 @@
+{
+  "title": "Product catalog",
+  "subtitle": "Master inventory of ingredients and products",
+  "newProduct": "New product",
+  "filters": {
+    "title": "Filters",
+    "searchPlaceholder": "Search by SKU, name or alias...",
+    "allCategories": "All categories",
+    "quarantineOnly": "Quarantine only",
+    "includeArchived": "Include archived"
+  },
+  "cols": {
+    "sku": "SKU",
+    "name": "Name",
+    "category": "Category",
+    "unitCost": "Unit cost",
+    "unit": "Unit",
+    "status": "Status"
+  },
+  "status": {
+    "ok": "Active",
+    "quarantine": "No cost",
+    "archived": "Archived"
+  },
+  "pagination": {
+    "showing": "Showing {{count}} of {{total}}",
+    "prev": "Previous",
+    "next": "Next"
+  }
+}

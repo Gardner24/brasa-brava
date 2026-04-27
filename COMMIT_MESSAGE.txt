@@ -1,0 +1,87 @@
+feat: scaffold initial system — Phase 0 → Phase 2 frontend with branding
+
+Sets up the full Brasa Brava monorepo end-to-end: discovery, schema,
+backend API with full CRUD on products and recipes, recursive cost
+calculation, audit trail, frontend dashboard and visual identity.
+
+# Phase 0 — Discovery & ADRs
+- Reverse-engineered Plantilla Mauricio final.xlsm (83 ingredients,
+  37 recipes, 14 categories with semantic duplicates)
+- ADR-001: collapsed 14 → 9 canonical product categories with explicit
+  per-product overrides and 1 sub-recipe promotion (Pepinillos)
+- ADR-002 to 007: stack (Fastify+Prisma+React+Tailwind), JWT auth,
+  multi-tenant via Postgres RLS, bilingual ES/EN with live switch,
+  flexible audit modes (FULL/CATEGORY/SPOT/ABC_CYCLE/CUSTOM),
+  current-cost only migration (history grows from day 1)
+
+# Phase 1 — Foundation
+- pnpm monorepo: apps/{api,web} + packages/{db,shared-types,config}
+- docker-compose: Postgres 16 + Redis 7 + MailHog with healthchecks
+- Prisma schema: 27 models/enums covering tenants, roles, products,
+  categories, recipes, lines, menus, warehouses, stock movements,
+  audits, audit counts, stock adjustments, service events, audit_log,
+  low stock alerts
+- RLS migration: forced row-level security on 17 tenant-scoped tables
+  (direct tenant_id and join-based policies), plus generated columns
+  (unit_cost, variance_qty, variance_value), CHECK constraints,
+  audit_log immutability via revoked grants + defensive trigger
+- Reproducible seed: reads .xlsm with exceljs, applies category map
+  with quarantine for 16 cost-missing items, promotes sub-recipes,
+  signs migration-report-<ISO>.json
+- Fastify API: helmet, cors, cookie, rate limit, swagger; plugins for
+  JWT auth (Argon2id, refresh rotation with reuse detection),
+  tenant context (SET LOCAL within transaction), error handler
+  translating Zod/Prisma/DomainError to stable codes, audit log helper
+- React + Vite + Tailwind shell with i18next (live ES/EN switch,
+  preserves form state via React Hook Form), TanStack Query
+- CI: lint, typecheck, unit tests, integration tests against real
+  Postgres service, build, pnpm audit, CodeQL weekly
+
+# Phase 2 — Catalog + Recipes
+- Schema additions: product_aliases (resolves Paprika Dulce/Ahumada
+  inconsistencies), version columns on Product/Recipe for optimistic
+  concurrency
+- Products CRUD: list with filters (search, category, isActive,
+  dataQualityIssue, alias search), detail with price history + uses,
+  create, patch with version check, archive (soft delete with
+  dependency check), aliases CRUD, paginated price history
+- Recipes CRUD: list, detail with **recursive CTE for cost rollup**
+  (expands sub-recipes, scales by yield_qty, depth ≤10 safety),
+  scale endpoint (cost for N guests with expanded ingredients),
+  atomic line replacement with cycle detection on sub-recipes
+- Categories CRUD with parent hierarchy, dependency-checked delete
+- Audit log endpoint: filterable timeline (entity, entityId, actor,
+  action, date range)
+- Audit helper: every mutation records before/after/diff to audit_log
+- Frontend: react-router-dom v6 routing, AuthContext with auto-refresh
+  60s before expiry, ApiError typed client, TanStack Query hooks per
+  resource. Pages: LoginPage, CatalogPage (table + 4 filters + status
+  badges), RecipesPage (split-pane with live cost from CTE),
+  AuditLogPage (timeline + JSON diff details). Sidebar with active
+  state, Topbar with logout
+
+# Branding (this commit)
+- Brasa Brava palette: charcoal (#14100c), ember (#d4451f), cream
+  (#fdf6e9), tortilla sidebar (#f5e6d3), wood text (#8a6d56)
+- Display font: Playfair Display (Google Fonts) with Georgia fallback
+- HeroIntro component: full-viewport hero with SVG embers + grill
+  bars, scroll indicator, ember CTA. Embedded at top of LoginPage —
+  user scrolls past the brand statement to reach the form
+- Sidebar: tortilla bg with ember left-border on active item,
+  italic display quote at the bottom
+- Topbar: ember pill for user identity
+- Badge: per-canonical-category color variants (CARNES = ember,
+  ESPECIAS = neutral, SALSAS = ember/coral, ACEITES_GRASAS = warning,
+  LACTEOS = tortilla, FRUTAS_VERDURAS = success, etc.)
+- Page headers in font-display (Playfair) for editorial weight
+
+Verified end-to-end: docker compose up, pnpm install + db:migrate +
+db:seed import 82 products + 33 recipes from Excel, login emits JWT
+with version + exp claims, CRUD endpoints respect optimistic locking
+and emit audit_log entries, recursive cost CTE returns ₡107.44 per
+portion for "Mini Papas al Romero" — matching the original Excel
+exactly (2148.77 / 20 personas).
+
+Pending for Phase 2.5: write forms in UI (drawers for create/edit
+products and recipes), recipe lines editor with drag-and-drop, E2E
+tests with Playwright.

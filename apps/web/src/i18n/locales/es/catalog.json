@@ -1,0 +1,30 @@
+{
+  "title": "Catálogo de productos",
+  "subtitle": "Inventario maestro de ingredientes y productos",
+  "newProduct": "Nuevo producto",
+  "filters": {
+    "title": "Filtros",
+    "searchPlaceholder": "Buscar por SKU, nombre o alias...",
+    "allCategories": "Todas las categorías",
+    "quarantineOnly": "Solo en cuarentena",
+    "includeArchived": "Incluir archivados"
+  },
+  "cols": {
+    "sku": "SKU",
+    "name": "Nombre",
+    "category": "Categoría",
+    "unitCost": "Costo unit.",
+    "unit": "Unidad",
+    "status": "Estado"
+  },
+  "status": {
+    "ok": "Activo",
+    "quarantine": "Sin costo",
+    "archived": "Archivado"
+  },
+  "pagination": {
+    "showing": "Mostrando {{count}} de {{total}}",
+    "prev": "Anterior",
+    "next": "Siguiente"
+  }
+}

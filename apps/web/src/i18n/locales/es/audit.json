@@ -1,0 +1,13 @@
+{
+  "title": "Bitácora de auditoría",
+  "subtitle": "Rastro inmutable de todas las mutaciones del sistema",
+  "filters": "Filtros",
+  "allEntities": "Todas las entidades",
+  "allActions": "Todas las acciones",
+  "refresh": "Refrescar",
+  "empty": "No hay eventos que coincidan con los filtros",
+  "viewDiff": "Ver diff",
+  "showing": "Mostrando {{count}} de {{total}}",
+  "prev": "Anterior",
+  "next": "Siguiente"
+}

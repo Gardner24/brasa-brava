@@ -1,0 +1,570 @@
+// =============================================================
+// Brasa Brava — Schema Prisma
+// Modelo de dominio completo (ADR-001 a ADR-007)
+// =============================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [uuidOssp(map: "uuid-ossp"), pgcrypto, citext, btree_gin]
+}
+
+// =============================================================
+// 1. Multi-tenant
+// =============================================================
+
+model Tenant {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique @db.VarChar(40)
+  displayName String   @map("display_name") @db.VarChar(120)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  users           User[]
+  productCategories ProductCategory[]
+  products        Product[]
+  recipes         Recipe[]
+  menus           Menu[]
+  warehouses      Warehouse[]
+  stockLevels     StockLevel[]
+  stockMovements  StockMovement[]
+  audits          Audit[]
+  serviceEvents   ServiceEvent[]
+  lowStockAlerts  LowStockAlert[]
+
+  @@map("tenants")
+}
+
+// =============================================================
+// 2. Identity & RBAC
+// =============================================================
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique @db.VarChar(32) // ADMIN | AUDITOR | OPERATOR | VIEWER
+  displayName String   @map("display_name") @db.VarChar(80)
+  permissions Json     // ['product.read','audit.run',...]
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  tenantId     String    @map("tenant_id") @db.Uuid
+  email        String    @unique @db.Citext
+  fullName     String    @map("full_name") @db.VarChar(120)
+  passwordHash String    @map("password_hash")
+  isActive     Boolean   @default(true) @map("is_active")
+  mfaEnabled   Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret    String?   @map("mfa_secret")
+  locale       String    @default("es") @db.Char(2)
+  lastLoginAt  DateTime? @map("last_login_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant            Tenant              @relation(fields: [tenantId], references: [id])
+  userRoles         UserRole[]
+  refreshTokens     AuthRefreshToken[]
+  auditsConducted   Audit[]             @relation("AuditConductor")
+  auditsApproved    Audit[]             @relation("AuditApprover")
+  movementsPerformed StockMovement[]
+  countsPerformed   AuditCount[]
+  adjustmentsApproved StockAdjustment[]
+  serviceEventsCreated ServiceEvent[]
+  priceHistoryCreated ProductPriceHistory[]
+  alertsResolved    LowStockAlert[]
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+model UserRole {
+  userId String @map("user_id") @db.Uuid
+  roleId String @map("role_id") @db.Uuid
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model AuthRefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(6)
+  replacedById String? @map("replaced_by_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  ipAddress  String?   @map("ip_address") @db.Inet
+  userAgent  String?   @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@map("auth_refresh_tokens")
+}
+
+// =============================================================
+// 3. Catálogo de productos
+// =============================================================
+
+model ProductCategory {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  code        String   @db.VarChar(32) // CARNES, ESPECIAS, ...
+  displayName String   @map("display_name") @db.VarChar(80)
+  description String?
+  parentId    String?  @map("parent_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  tenant   Tenant            @relation(fields: [tenantId], references: [id])
+  parent   ProductCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children ProductCategory[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@map("product_categories")
+}
+
+enum DataQualityIssue {
+  MISSING_COST
+  MISSING_PACKAGE_SIZE
+  AMBIGUOUS_UNIT
+
+  @@map("data_quality_issue")
+}
+
+model Product {
+  id                 String             @id @default(uuid()) @db.Uuid
+  tenantId           String             @map("tenant_id") @db.Uuid
+  sku                String             @db.VarChar(40)
+  // Bilingual name: { es: "Aceite de Oliva", en: "Olive Oil" }
+  name               Json
+  categoryId         String             @map("category_id") @db.Uuid
+  baseUnit           String             @map("base_unit") @db.VarChar(8) // 'g' | 'ml' | 'unit'
+  packageSize        Decimal?           @map("package_size") @db.Decimal(12, 4)
+  packageCost        Decimal?           @map("package_cost") @db.Decimal(12, 4)
+  // unit_cost is a generated column populated via raw SQL migration:
+  // GENERATED ALWAYS AS (CASE WHEN package_size > 0 THEN package_cost / package_size END) STORED
+  unitCost           Decimal?           @map("unit_cost") @db.Decimal(14, 6)
+  reorderPoint       Decimal?           @map("reorder_point") @db.Decimal(12, 4)
+  reorderQty         Decimal?           @map("reorder_qty") @db.Decimal(12, 4)
+  isActive           Boolean            @default(true) @map("is_active")
+  dataQualityIssue   DataQualityIssue?  @map("data_quality_issue")
+  notes              String?
+  // Optimistic concurrency: cada UPDATE incrementa version y exige version actual en WHERE.
+  version            Int                @default(0)
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant         Tenant                @relation(fields: [tenantId], references: [id])
+  category       ProductCategory       @relation(fields: [categoryId], references: [id])
+  priceHistory   ProductPriceHistory[]
+  aliases        ProductAlias[]
+  recipeLines    RecipeLine[]
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  auditCounts    AuditCount[]
+  alerts         LowStockAlert[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId, isActive])
+  @@index([categoryId])
+  @@map("products")
+}
+
+/// Aliases para resolver inconsistencias entre el catálogo maestro y referencias
+/// en recetas (ej: catálogo dice "Paprika", receta dice "Paprika Dulce").
+/// Usado por el seed para auto-resolver y por la UI para añadir aliases manualmente.
+model ProductAlias {
+  id        String   @id @default(uuid()) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  alias     String   @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdById String? @map("created_by_id") @db.Uuid
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, alias])
+  @@index([alias])
+  @@map("product_aliases")
+}
+
+model ProductPriceHistory {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  packageCost  Decimal  @map("package_cost") @db.Decimal(12, 4)
+  packageSize  Decimal  @map("package_size") @db.Decimal(12, 4)
+  effectiveAt  DateTime @default(now()) @map("effective_at") @db.Timestamptz(6)
+  source       String   @default("manual") @db.VarChar(40)
+  createdById  String   @map("created_by_id") @db.Uuid
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdById], references: [id])
+
+  @@index([productId, effectiveAt])
+  @@map("product_price_history")
+}
+
+// =============================================================
+// 4. Recetas (escandallos)
+// =============================================================
+
+model Recipe {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String   @map("tenant_id") @db.Uuid
+  code           String   @db.VarChar(40)
+  // Bilingual name
+  name           Json
+  yieldQty       Decimal  @default(1) @map("yield_qty") @db.Decimal(12, 4)
+  yieldUnit      String   @default("porcion") @map("yield_unit") @db.VarChar(16)
+  instructions   String?
+  cookingTemp    String?  @map("cooking_temp") @db.VarChar(40)
+  cookingTime    String?  @map("cooking_time") @db.VarChar(40)
+  isActive       Boolean  @default(true) @map("is_active")
+  // Optimistic concurrency
+  version        Int      @default(0)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  lines        RecipeLine[] @relation("RecipeLines")
+  usedAsSubIn  RecipeLine[] @relation("SubRecipeRef")
+  menuRecipes  MenuRecipe[]
+  serviceItems ServiceEventRecipe[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId, isActive])
+  @@map("recipes")
+}
+
+model RecipeLine {
+  id             String   @id @default(uuid()) @db.Uuid
+  recipeId       String   @map("recipe_id") @db.Uuid
+  productId      String?  @map("product_id") @db.Uuid
+  subRecipeId    String?  @map("sub_recipe_id") @db.Uuid
+  qtyPerPortion  Decimal  @map("qty_per_portion") @db.Decimal(12, 4)
+  unit           String   @db.VarChar(8)
+  notes          String?
+  position       Int      @db.SmallInt
+
+  recipe    Recipe  @relation("RecipeLines", fields: [recipeId], references: [id], onDelete: Cascade)
+  product   Product? @relation(fields: [productId], references: [id])
+  subRecipe Recipe? @relation("SubRecipeRef", fields: [subRecipeId], references: [id])
+
+  @@index([recipeId])
+  @@index([productId])
+  @@index([subRecipeId])
+  // CHECK constraint applied via raw SQL: exactly one of product_id / sub_recipe_id must be set.
+  @@map("recipe_lines")
+}
+
+model Menu {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  code        String   @db.VarChar(20) // AMERICANA, ARGENTINA, TICA
+  displayName Json     @map("display_name") // bilingual
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  menuRecipes   MenuRecipe[]
+  serviceEvents ServiceEvent[]
+
+  @@unique([tenantId, code])
+  @@map("menus")
+}
+
+model MenuRecipe {
+  menuId   String @map("menu_id") @db.Uuid
+  recipeId String @map("recipe_id") @db.Uuid
+  position Int    @db.SmallInt
+
+  menu   Menu   @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@id([menuId, recipeId])
+  @@map("menu_recipes")
+}
+
+// =============================================================
+// 5. Inventario
+// =============================================================
+
+model Warehouse {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  code        String   @db.VarChar(20)
+  displayName String   @map("display_name") @db.VarChar(80)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  audits         Audit[]
+  serviceEvents  ServiceEvent[]
+  alerts         LowStockAlert[]
+
+  @@unique([tenantId, code])
+  @@map("warehouses")
+}
+
+model StockLevel {
+  productId   String   @map("product_id") @db.Uuid
+  warehouseId String   @map("warehouse_id") @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  qtyOnHand   Decimal  @default(0) @map("qty_on_hand") @db.Decimal(14, 4)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@id([productId, warehouseId])
+  @@index([tenantId])
+  @@map("stock_levels")
+}
+
+enum MovementType {
+  PURCHASE
+  CONSUMPTION
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+  WASTE
+  RETURN
+  INITIAL
+
+  @@map("movement_type")
+}
+
+model StockMovement {
+  id            String       @id @default(uuid()) @db.Uuid
+  tenantId      String       @map("tenant_id") @db.Uuid
+  productId     String       @map("product_id") @db.Uuid
+  warehouseId   String       @map("warehouse_id") @db.Uuid
+  movementType  MovementType @map("movement_type")
+  qty           Decimal      @db.Decimal(14, 4) // positive = in, negative = out
+  unitCost      Decimal?     @map("unit_cost") @db.Decimal(14, 6)
+  referenceType String?      @map("reference_type") @db.VarChar(40) // 'AUDIT' | 'SERVICE_EVENT' | ...
+  referenceId   String?      @map("reference_id") @db.Uuid
+  notes         String?
+  performedAt   DateTime     @default(now()) @map("performed_at") @db.Timestamptz(6)
+  performedById String       @map("performed_by_id") @db.Uuid
+
+  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  product     Product           @relation(fields: [productId], references: [id])
+  warehouse   Warehouse         @relation(fields: [warehouseId], references: [id])
+  performedBy User              @relation(fields: [performedById], references: [id])
+  adjustment  StockAdjustment?
+
+  @@index([tenantId, performedAt(sort: Desc)])
+  @@index([productId, performedAt(sort: Desc)])
+  @@index([referenceType, referenceId])
+  @@map("stock_movements")
+}
+
+// =============================================================
+// 6. Auditorías
+// =============================================================
+
+enum AuditStatus {
+  DRAFT
+  IN_PROGRESS
+  COUNTED
+  RECONCILED
+  CLOSED
+  CANCELLED
+
+  @@map("audit_status")
+}
+
+enum AuditScopeType {
+  FULL
+  CATEGORY
+  SPOT
+  ABC_CYCLE
+  CUSTOM
+
+  @@map("audit_scope_type")
+}
+
+model Audit {
+  id                  String         @id @default(uuid()) @db.Uuid
+  tenantId            String         @map("tenant_id") @db.Uuid
+  code                String         @db.VarChar(40)
+  warehouseId         String         @map("warehouse_id") @db.Uuid
+  scopeType           AuditScopeType @default(FULL) @map("scope_type")
+  scopeFilter         Json           @default("{}") @map("scope_filter")
+  status              AuditStatus    @default(DRAFT)
+  scheduledAt         DateTime?      @map("scheduled_at") @db.Timestamptz(6)
+  startedAt           DateTime?      @map("started_at") @db.Timestamptz(6)
+  closedAt            DateTime?      @map("closed_at") @db.Timestamptz(6)
+  conductedById       String         @map("conducted_by_id") @db.Uuid
+  approvedById        String?        @map("approved_by_id") @db.Uuid
+  notes               String?
+  totalVarianceQty    Decimal?       @map("total_variance_qty") @db.Decimal(14, 4)
+  totalVarianceValue  Decimal?       @map("total_variance_value") @db.Decimal(14, 2)
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  warehouse   Warehouse    @relation(fields: [warehouseId], references: [id])
+  conductedBy User         @relation("AuditConductor", fields: [conductedById], references: [id])
+  approvedBy  User?        @relation("AuditApprover", fields: [approvedById], references: [id])
+  counts      AuditCount[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId, status])
+  @@map("audits")
+}
+
+model AuditCount {
+  id            String    @id @default(uuid()) @db.Uuid
+  auditId       String    @map("audit_id") @db.Uuid
+  productId     String    @map("product_id") @db.Uuid
+  expectedQty   Decimal   @map("expected_qty") @db.Decimal(14, 4)
+  countedQty    Decimal?  @map("counted_qty") @db.Decimal(14, 4)
+  // variance_qty + variance_value applied as GENERATED columns via raw SQL migration
+  varianceQty   Decimal?  @map("variance_qty") @db.Decimal(14, 4)
+  unitCost      Decimal   @map("unit_cost") @db.Decimal(14, 6)
+  varianceValue Decimal?  @map("variance_value") @db.Decimal(14, 2)
+  reasonCode    String?   @map("reason_code") @db.VarChar(40) // WASTE | THEFT | MISCOUNT | EXPIRY | ...
+  notes         String?
+  countedById   String?   @map("counted_by_id") @db.Uuid
+  countedAt     DateTime? @map("counted_at") @db.Timestamptz(6)
+
+  audit      Audit            @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  product    Product          @relation(fields: [productId], references: [id])
+  countedBy  User?            @relation(fields: [countedById], references: [id])
+  adjustment StockAdjustment?
+
+  @@unique([auditId, productId])
+  @@index([auditId])
+  @@map("audit_counts")
+}
+
+model StockAdjustment {
+  id           String   @id @default(uuid()) @db.Uuid
+  auditCountId String   @unique @map("audit_count_id") @db.Uuid
+  movementId   String   @unique @map("movement_id") @db.Uuid
+  approvedById String   @map("approved_by_id") @db.Uuid
+  approvedAt   DateTime @default(now()) @map("approved_at") @db.Timestamptz(6)
+
+  auditCount AuditCount    @relation(fields: [auditCountId], references: [id])
+  movement   StockMovement @relation(fields: [movementId], references: [id])
+  approvedBy User          @relation(fields: [approvedById], references: [id])
+
+  @@map("stock_adjustments")
+}
+
+// =============================================================
+// 7. Eventos de servicio
+// =============================================================
+
+enum ServiceEventStatus {
+  PLANNED
+  EXECUTED
+  CANCELLED
+
+  @@map("service_event_status")
+}
+
+model ServiceEvent {
+  id           String             @id @default(uuid()) @db.Uuid
+  tenantId     String             @map("tenant_id") @db.Uuid
+  code         String             @db.VarChar(40)
+  menuId       String?            @map("menu_id") @db.Uuid
+  guestCount   Int                @map("guest_count")
+  scheduledAt  DateTime           @map("scheduled_at") @db.Timestamptz(6)
+  status       ServiceEventStatus @default(PLANNED)
+  warehouseId  String             @map("warehouse_id") @db.Uuid
+  createdById  String             @map("created_by_id") @db.Uuid
+  createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  tenant    Tenant               @relation(fields: [tenantId], references: [id])
+  menu      Menu?                @relation(fields: [menuId], references: [id])
+  warehouse Warehouse            @relation(fields: [warehouseId], references: [id])
+  createdBy User                 @relation(fields: [createdById], references: [id])
+  recipes   ServiceEventRecipe[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId, status, scheduledAt])
+  @@map("service_events")
+}
+
+model ServiceEventRecipe {
+  serviceEventId String  @map("service_event_id") @db.Uuid
+  recipeId       String  @map("recipe_id") @db.Uuid
+  portions       Decimal @db.Decimal(12, 4)
+
+  serviceEvent ServiceEvent @relation(fields: [serviceEventId], references: [id], onDelete: Cascade)
+  recipe       Recipe       @relation(fields: [recipeId], references: [id])
+
+  @@id([serviceEventId, recipeId])
+  @@map("service_event_recipes")
+}
+
+// =============================================================
+// 8. Audit log inmutable
+// =============================================================
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  occurredAt  DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  tenantId    String?  @map("tenant_id") @db.Uuid
+  actorId     String?  @map("actor_id") @db.Uuid
+  actorEmail  String   @map("actor_email") @db.Citext
+  entity      String   @db.VarChar(60) // 'product' | 'recipe' | 'audit' | ...
+  entityId    String   @map("entity_id") @db.Uuid
+  action      String   @db.VarChar(20) // INSERT | UPDATE | DELETE | LOGIN | LOGIN_FAILED | EXPORT
+  beforeJson  Json?    @map("before_json")
+  afterJson   Json?    @map("after_json")
+  diffJson    Json?    @map("diff_json")
+  ipAddress   String?  @map("ip_address") @db.Inet
+  userAgent   String?  @map("user_agent")
+  requestId   String?  @map("request_id") @db.Uuid
+
+  @@index([entity, entityId, occurredAt(sort: Desc)])
+  @@index([actorId, occurredAt(sort: Desc)])
+  @@index([tenantId, occurredAt(sort: Desc)])
+  @@map("audit_log")
+}
+
+// =============================================================
+// 9. Alertas
+// =============================================================
+
+model LowStockAlert {
+  id            String    @id @default(uuid()) @db.Uuid
+  tenantId      String    @map("tenant_id") @db.Uuid
+  productId     String    @map("product_id") @db.Uuid
+  warehouseId   String    @map("warehouse_id") @db.Uuid
+  qtyOnHand     Decimal   @map("qty_on_hand") @db.Decimal(14, 4)
+  reorderPoint  Decimal   @map("reorder_point") @db.Decimal(14, 4)
+  raisedAt      DateTime  @default(now()) @map("raised_at") @db.Timestamptz(6)
+  resolvedAt    DateTime? @map("resolved_at") @db.Timestamptz(6)
+  resolvedById  String?   @map("resolved_by_id") @db.Uuid
+
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
+  warehouse  Warehouse @relation(fields: [warehouseId], references: [id])
+  resolvedBy User?     @relation(fields: [resolvedById], references: [id])
+
+  @@unique([productId, warehouseId, raisedAt])
+  @@index([tenantId, resolvedAt])
+  @@map("low_stock_alerts")
+}

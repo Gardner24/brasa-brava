@@ -1,0 +1,18 @@
+# Normaliza line endings: LF en repo, CRLF en checkout para Windows
+* text=auto eol=lf
+
+# Binarios — no diff ni eol conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.pdf binary
+*.xlsx binary
+*.xlsm binary
+*.docx binary
+*.pptx binary
+
+# Lock files mantienen su formato
+pnpm-lock.yaml -text

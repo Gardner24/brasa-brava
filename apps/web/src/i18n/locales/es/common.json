@@ -1,0 +1,55 @@
+{
+  "app": {
+    "name": "Brasa Brava",
+    "tagline": "Inventario y Auditoría"
+  },
+  "nav": {
+    "dashboard": "Inicio",
+    "catalog": "Catálogo",
+    "recipes": "Recetas",
+    "inventory": "Inventario",
+    "audits": "Auditorías",
+    "movements": "Movimientos",
+    "alerts": "Alertas",
+    "admin": "Administración",
+    "auditLog": "Bitácora"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "create": "Crear",
+    "search": "Buscar",
+    "refresh": "Refrescar",
+    "logout": "Cerrar sesión"
+  },
+  "login": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Ingresar",
+    "welcomeBack": "Bienvenido de vuelta",
+    "welcomeSub": "Ingresa con tu cuenta para acceder al panel"
+  },
+  "hero": {
+    "eyebrow": "Parrilla · Eventos",
+    "tagline": "Inventario · Auditoría · Costeo",
+    "subtitle": "Del Excel al sistema. Cada gramo contado, cada colón trazado, cada cambio auditado. Para que la brasa sea brava donde importa: en la parrilla.",
+    "enter": "Entrar al panel",
+    "scroll": "scroll",
+    "scrollDown": "Bajar al formulario"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "Inglés"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "Datos inválidos. Revisa los campos.",
+    "UNAUTHORIZED": "Sesión expirada. Inicia sesión nuevamente.",
+    "FORBIDDEN": "No tienes permisos para esta acción.",
+    "NOT_FOUND": "No se encontró el recurso.",
+    "CONFLICT": "Ya existe un registro con esos datos.",
+    "INTERNAL": "Error interno. Intenta de nuevo."
+  }
+}

@@ -1,0 +1,49 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build artefacts
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# env
+.env
+.env.*.local
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# test
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# generated
+apps/api/src/openapi.generated.json
+apps/web/src/lib/api.generated.ts
+
+# secrets
+*.pem
+*.key
+
+# seed reports (generated, but kept versioned by date when relevant)
+packages/db/seed/reports/migration-report-*.json
+
+# Prisma local cache
+.prisma/

@@ -1,0 +1,14 @@
+{
+  "title": "Main dashboard",
+  "subtitle": "Real-time operational overview",
+  "kpis": {
+    "stockValue": "Stock value",
+    "lowStockItems": "Items below reorder point",
+    "openAudits": "Open audits",
+    "monthVariance": "30-day variance"
+  },
+  "empty": {
+    "title": "System just initialized",
+    "body": "No movements recorded yet. Start by creating a purchase order or record an initial count."
+  }
+}

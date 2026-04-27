@@ -1,0 +1,29 @@
+{
+  "name": "brasa-brava",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema de Gestión de Inventarios y Auditoría — Brasa Brava",
+  "packageManager": "pnpm@9.7.0",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --recursive --filter \"./apps/*\" dev",
+    "build": "pnpm --recursive --filter \"./apps/*\" --filter \"./packages/*\" build",
+    "lint": "pnpm --recursive lint",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm --recursive test",
+    "db:migrate": "pnpm --filter @brasa/db migrate",
+    "db:seed": "pnpm --filter @brasa/db seed",
+    "db:reset": "pnpm --filter @brasa/db reset",
+    "compose:up": "docker compose up -d",
+    "compose:down": "docker compose down",
+    "compose:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}

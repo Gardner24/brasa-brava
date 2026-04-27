@@ -1,0 +1,13 @@
+{
+  "title": "Audit trail",
+  "subtitle": "Immutable record of every mutation in the system",
+  "filters": "Filters",
+  "allEntities": "All entities",
+  "allActions": "All actions",
+  "refresh": "Refresh",
+  "empty": "No events match the filters",
+  "viewDiff": "View diff",
+  "showing": "Showing {{count}} of {{total}}",
+  "prev": "Previous",
+  "next": "Next"
+}

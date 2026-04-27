@@ -1,0 +1,55 @@
+{
+  "app": {
+    "name": "Brasa Brava",
+    "tagline": "Inventory & Audit"
+  },
+  "nav": {
+    "dashboard": "Home",
+    "catalog": "Catalog",
+    "recipes": "Recipes",
+    "inventory": "Inventory",
+    "audits": "Audits",
+    "movements": "Movements",
+    "alerts": "Alerts",
+    "admin": "Admin",
+    "auditLog": "Audit log"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "search": "Search",
+    "refresh": "Refresh",
+    "logout": "Log out"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "welcomeBack": "Welcome back",
+    "welcomeSub": "Sign in to access the panel"
+  },
+  "hero": {
+    "eyebrow": "Grill · Events",
+    "tagline": "Inventory · Audit · Costing",
+    "subtitle": "From Excel to system. Every gram counted, every colón traced, every change audited. So the embers are bold where it matters: at the grill.",
+    "enter": "Enter the panel",
+    "scroll": "scroll",
+    "scrollDown": "Scroll to form"
+  },
+  "language": {
+    "label": "Language",
+    "es": "Spanish",
+    "en": "English"
+  },
+  "errors": {
+    "VALIDATION_FAILED": "Invalid data. Check the fields.",
+    "UNAUTHORIZED": "Session expired. Please sign in again.",
+    "FORBIDDEN": "You don't have permission for this action.",
+    "NOT_FOUND": "Resource not found.",
+    "CONFLICT": "A record with these values already exists.",
+    "INTERNAL": "Internal error. Please try again."
+  }
+}

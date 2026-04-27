@@ -1,0 +1,17 @@
+{
+  "title": "Recipes",
+  "searchPlaceholder": "Search recipe...",
+  "linesCount": "{{count}} ingredients",
+  "emptyState": "Select a recipe to view its breakdown",
+  "yield": "Yields {{qty}} {{unit}}",
+  "costPerPortion": "Cost per portion",
+  "incompleteCost": "Incomplete cost",
+  "instructions": "Instructions",
+  "cols": {
+    "ingredient": "Ingredient",
+    "qty": "Quantity",
+    "unit": "Unit",
+    "unitCost": "Unit cost",
+    "lineCost": "Line cost"
+  }
+}

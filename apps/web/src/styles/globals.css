@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================
+   Brasa Brava — Paleta de marca
+   Inspirada en parrilla argentina/uruguaya:
+   - charcoal:  carbón apagado
+   - ember:     brasa viva (rojo/naranja)
+   - cream:     tortilla / superficie cálida
+   - wood:      quebracho / texto muted
+   - tortilla:  cream del sidebar
+   ============================================================= */
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --background: 38 89% 95%;          /* cream #fdf6e9 */
+    --foreground: 24 50% 6%;           /* charcoal #14100c */
+    --card: 0 0% 100%;                 /* white */
+    --card-foreground: 24 50% 6%;
+
+    /* Sidebar / topbar específico */
+    --sidebar: 33 67% 90%;             /* tortilla #f5e6d3 */
+
+    /* Borders y rings */
+    --border: 30 25% 85%;
+    --input: 30 25% 85%;
+    --ring: 13 75% 47%;                /* ember */
+
+    /* Muted */
+    --muted: 33 51% 90%;
+    --muted-foreground: 24 23% 38%;    /* wood #8a6d56 */
+
+    /* Brand: ember orange */
+    --brand: 13 75% 47%;               /* #d4451f */
+    --brand-foreground: 38 89% 95%;    /* cream sobre brand */
+    --brand-hover: 13 75% 41%;
+
+    /* Semánticos */
+    --destructive: 0 75% 47%;
+    --destructive-foreground: 38 89% 95%;
+    --success: 100 73% 33%;            /* verde olivo */
+    --warning: 31 78% 41%;             /* amber tostado */
+  }
+
+  .dark {
+    --background: 24 33% 4%;           /* charcoal profundo */
+    --foreground: 38 89% 95%;
+    --card: 24 35% 9%;
+    --card-foreground: 38 89% 95%;
+    --sidebar: 24 30% 11%;
+    --border: 24 25% 18%;
+    --input: 24 25% 18%;
+    --ring: 13 78% 55%;
+    --muted: 24 28% 14%;
+    --muted-foreground: 33 25% 65%;
+    --brand: 13 78% 55%;               /* ember más vivo en dark */
+    --brand-foreground: 24 33% 4%;
+    --brand-hover: 13 78% 60%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 38 89% 95%;
+    --success: 100 60% 45%;
+    --warning: 31 78% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'kern', 'liga', 'cv11';
+  }
+  /* Tabular numerals para columnas de costos/cantidades */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Stack tipográfico de marca */
+.font-display {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-feature-settings: 'kern', 'liga';
+  letter-spacing: -0.02em;
+}
+
+/* Animación del scroll indicator */
+@keyframes brasa-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.45; }
+  50% { transform: translateY(6px); opacity: 0.95; }
+}
+.animate-brasa-bounce {
+  animation: brasa-bounce 2s ease-in-out infinite;
+}
