@@ -1,0 +1,31 @@
+{
+  "title": "Stock alerts",
+  "subtitle": "Products below their reorder point",
+  "filters": {
+    "title": "Filters",
+    "warehouse": "Warehouse",
+    "allWarehouses": "All warehouses",
+    "showResolved": "Show resolved"
+  },
+  "card": {
+    "raisedAt": "Raised",
+    "atRaise": "At raise",
+    "now": "Now",
+    "reorderPoint": "Reorder point",
+    "diff": "Missing",
+    "resolveCta": "Resolve",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Comment about the resolution...",
+    "confirmResolve": "Confirm",
+    "resolved": "Resolved",
+    "resolvedAt": "Resolved",
+    "openSince": "Open since"
+  },
+  "empty": {
+    "open": "No open alerts. All stock is above its reorder point.",
+    "all": "No alerts registered."
+  },
+  "errors": {
+    "alreadyResolved": "This alert was already resolved."
+  }
+}

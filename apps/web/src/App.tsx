@@ -10,6 +10,7 @@ import { AuditLogPage } from '@/pages/AuditLogPage.tsx';
 import { WarehousesPage } from '@/pages/WarehousesPage.tsx';
 import { InventoryPage } from '@/pages/InventoryPage.tsx';
 import { MovementsPage } from '@/pages/MovementsPage.tsx';
+import { AlertsPage } from '@/pages/AlertsPage.tsx';
 
 export function App() {
   return (
@@ -25,6 +26,7 @@ export function App() {
             <Route path="/warehouses" element={<WarehousesPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/movements" element={<MovementsPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/admin/audit-log" element={<AuditLogPage />} />
             <Route path="*" element={<Navigate to="/catalog" replace />} />
           </Route>

@@ -28,8 +28,8 @@ const items: NavItem[] = [
   { key: 'warehouses', icon: Warehouse, to: '/warehouses' },
   { key: 'inventory', icon: Package, to: '/inventory' },
   { key: 'movements', icon: ArrowLeftRight, to: '/movements' },
+  { key: 'alerts', icon: BellRing, to: '/alerts' },
   { key: 'audits', icon: ClipboardCheck, to: '/audits', disabled: true },
-  { key: 'alerts', icon: BellRing, to: '/alerts', disabled: true },
 ];
 
 const adminItems: NavItem[] = [

@@ -13,6 +13,7 @@ import esRecipes from './locales/es/recipes.json';
 import esAudit from './locales/es/audit.json';
 import esInventory from './locales/es/inventory.json';
 import esMovements from './locales/es/movements.json';
+import esAlerts from './locales/es/alerts.json';
 import enCommon from './locales/en/common.json';
 import enDashboard from './locales/en/dashboard.json';
 import enCatalog from './locales/en/catalog.json';
@@ -20,6 +21,7 @@ import enRecipes from './locales/en/recipes.json';
 import enAudit from './locales/en/audit.json';
 import enInventory from './locales/en/inventory.json';
 import enMovements from './locales/en/movements.json';
+import enAlerts from './locales/en/alerts.json';
 
 export const SUPPORTED_LOCALES = ['es', 'en'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -30,7 +32,7 @@ void i18next
   .init({
     fallbackLng: 'es',
     supportedLngs: SUPPORTED_LOCALES as unknown as string[],
-    ns: ['common', 'dashboard', 'catalog', 'recipes', 'audit', 'inventory', 'movements'],
+    ns: ['common', 'dashboard', 'catalog', 'recipes', 'audit', 'inventory', 'movements', 'alerts'],
     defaultNS: 'common',
     detection: {
       order: ['localStorage', 'navigator'],
@@ -47,6 +49,7 @@ void i18next
         audit: esAudit,
         inventory: esInventory,
         movements: esMovements,
+        alerts: esAlerts,
       },
       en: {
         common: enCommon,
@@ -56,6 +59,7 @@ void i18next
         audit: enAudit,
         inventory: enInventory,
         movements: enMovements,
+        alerts: enAlerts,
       },
     },
   });
