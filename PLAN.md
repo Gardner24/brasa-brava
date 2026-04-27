@@ -4,7 +4,7 @@
 
 **Última auditoría:** 2026-04-27
 **Última fase cerrada:** Fase 2 (Catálogo + Recetas + Branding)
-**Fase en curso:** Fase 3 (Inventario) — Bloques 1-3 (backend) ✅, Bloque 4 (warehouses + inventory frontend) ✅, Bloques 5-7 ⏳
+**Fase en curso:** Fase 3 (Inventario) — Bloques 1-5 ✅, Bloques 6-7 ⏳
 
 ---
 
@@ -217,12 +217,12 @@ ES y EN paritarios en `common`, `dashboard`, `catalog`, `recipes`, `audit`. **Fa
 | 6.2 | Valorización por categoría | ✅ | ✅ | Sección dentro de InventoryPage con grand total |
 | 6.3 | Días de cobertura | 🟡 | ❌ | Datos denormalizados existen, falta job nocturno que llame `recalc_avg_daily_consumption()` |
 | **Movements** | | | | |
-| 7.1 | Compra (PURCHASE) con weighted average | ✅ | ❌ | Trigger DB recalcula `avg_unit_cost` |
-| 7.2 | Consumo (CONSUMPTION) | ✅ | ❌ | Snapshot de avg al momento del move |
-| 7.3 | Merma (WASTE) con razón obligatoria | ✅ | ❌ | |
-| 7.4 | Transferencia atómica entre almacenes | ✅ | ❌ | Genera 2 movements paired |
-| 7.5 | Ajuste manual con justificación | ✅ | ❌ | |
-| 7.6 | Listar movements (libro mayor) | ✅ | ❌ | |
+| 7.1 | Compra (PURCHASE) con weighted average | ✅ | ✅ | Validado e2e: 17 000 ml × ₡3,5 → PWAC = ₡3,5, valor ₡59 500 |
+| 7.2 | Consumo (CONSUMPTION) | ✅ | ✅ | Snapshot de avg al momento del move |
+| 7.3 | Merma (WASTE) con razón obligatoria | ✅ | ✅ | Select de WasteReason en UI |
+| 7.4 | Transferencia atómica entre almacenes | ✅ | ✅ | UI bloquea fromWarehouse == toWarehouse |
+| 7.5 | Ajuste manual con justificación | ✅ | ✅ | Notas obligatorias (≥5 chars) en form |
+| 7.6 | Listar movements (libro mayor) | ✅ | ✅ | MovementsPage con filtros warehouse/type/fechas |
 | **Alertas stock bajo** | | | | |
 | 8.1 | Trigger DB que crea/cierra alertas | ✅ | — | Decisión E1 implementada |
 | 8.2 | Listar alertas (open/all + filtro por almacén) | ✅ | ❌ | |
@@ -302,11 +302,10 @@ ES y EN paritarios en `common`, `dashboard`, `catalog`, `recipes`, `audit`. **Fa
 - **Acción:** migrar Catalog y AuditLog a TanStack Table (sort, filter, virtualization)
 - **Estimado:** 1 día — diferible hasta Fase 5
 
-**DT-007: Forms imperativos sin React Hook Form**
-- `react-hook-form` declarado pero no usado
-- LoginPage usa `useState` para campos. Cuando hagamos forms más complejos (CRUD producto, editor recetas) sin RHF la complejidad explota
-- **Acción:** introducir `<RHFForm>` wrapper y migrar LoginPage como ejemplo
-- **Estimado:** 0.5 día — bloqueante para Fase 3 frontend
+**DT-007: Forms imperativos sin React Hook Form** ✅ RESUELTO 2026-04-27 (Bloque 5)
+- ~~`react-hook-form` declarado pero no usado~~
+- ~~LoginPage usa `useState` para campos~~
+- Resolución: introducido `useZodForm` hook + `<FormField>` component, LoginPage migrada, los 5 forms de movements nacen con RHF + Zod resolver. `@hookform/resolvers@^3.9.0` agregado (la v5 requiere zod v4).
 
 **DT-008: `@brasa/config` sin contenido**
 - Carpeta declarada como workspace, sin `package.json` ni archivos
@@ -381,7 +380,7 @@ Brasa Brava es un **sistema de inventario y auditoría para una operación de pa
 
 ### Fase 3 — Inventario (en curso)
 
-**Estado:** Bloques 1-4 completos. Bloques 5-7 pendientes.
+**Estado:** Bloques 1-5 completos. Bloques 6-7 pendientes.
 
 #### Bloque 4 — Frontend warehouses + inventario ✅ CERRADO 2026-04-27
 
@@ -410,7 +409,7 @@ Brasa Brava es un **sistema de inventario y auditoría para una operación de pa
 - Click en COCINA → InventoryPage filtrada con stock vivo del seed (productos con compras registradas vía curl previo)
 - Switch ES/EN cambia toda la UI sin perder almacén seleccionado
 
-#### Bloque 5 — Frontend movimientos
+#### Bloque 5 — Frontend movimientos ✅ CERRADO 2026-04-27
 
 **Objetivo:** registrar compras, consumos, mermas, transferencias y ajustes desde UI.
 
