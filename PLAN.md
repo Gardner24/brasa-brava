@@ -4,7 +4,7 @@
 
 **Última auditoría:** 2026-04-27
 **Última fase cerrada:** Fase 2 (Catálogo + Recetas + Branding)
-**Fase en curso:** Fase 3 (Inventario) — Bloques 1-5 ✅, Bloques 6-7 ⏳
+**Fase en curso:** Fase 3 (Inventario) — Bloques 1-6 ✅, Bloque 7 (deuda técnica) ⏳
 
 ---
 
@@ -224,9 +224,9 @@ ES y EN paritarios en `common`, `dashboard`, `catalog`, `recipes`, `audit`. **Fa
 | 7.5 | Ajuste manual con justificación | ✅ | ✅ | Notas obligatorias (≥5 chars) en form |
 | 7.6 | Listar movements (libro mayor) | ✅ | ✅ | MovementsPage con filtros warehouse/type/fechas |
 | **Alertas stock bajo** | | | | |
-| 8.1 | Trigger DB que crea/cierra alertas | ✅ | — | Decisión E1 implementada |
-| 8.2 | Listar alertas (open/all + filtro por almacén) | ✅ | ❌ | |
-| 8.3 | Resolver manualmente | ✅ | ❌ | |
+| 8.1 | Trigger DB que crea/cierra alertas | ✅ | — | Decisión E1 implementada — validado e2e: stock 16 850 < reorder 20 000 → trigger crea alerta |
+| 8.2 | Listar alertas (open/all + filtro por almacén) | ✅ | ✅ | AlertsPage con cards, filtro warehouse + toggle "Mostrar resueltas" |
+| 8.3 | Resolver manualmente | ✅ | ✅ | Form inline en card con notes opcionales |
 | **Service events** | | | | |
 | 9.1 | CRUD eventos planificados | ❌ | ❌ | Modelo existe |
 | 9.2 | Marcar EXECUTED | ❌ | ❌ | Decisión C2: NO auto-consume |
@@ -434,7 +434,7 @@ Brasa Brava es un **sistema de inventario y auditoría para una operación de pa
 - Registra consumo de 3000ml → stock baja a 14000ml
 - Si configura reorder_point=15000, el consumo dispara alerta visible en sidebar (badge rojo)
 
-#### Bloque 6 — Frontend alertas + service events
+#### Bloque 6 — Frontend alertas (ServiceEvents diferidos a Fase 4 por F3-D3) ✅ CERRADO 2026-04-27
 
 **Objetivo:** completar Fase 3 con la bandeja de alertas operable y permitir planificar/ejecutar service events.
 
