@@ -4,7 +4,7 @@
 
 **Última auditoría:** 2026-04-27
 **Última fase cerrada:** Fase 2 (Catálogo + Recetas + Branding)
-**Fase en curso:** Fase 3 (Inventario) — Bloques 1-3 (backend) ✅, Bloques 4-7 (frontend) ⏳
+**Fase en curso:** Fase 3 (Inventario) — Bloques 1-3 (backend) ✅, Bloque 4 (warehouses + inventory frontend) ✅, Bloques 5-7 ⏳
 
 ---
 
@@ -210,11 +210,11 @@ ES y EN paritarios en `common`, `dashboard`, `catalog`, `recipes`, `audit`. **Fa
 | 4.7 | Scale (simulador N comensales) | ✅ | ❌ | |
 | 4.8 | Archivar | ✅ | ❌ | |
 | **Almacenes** | | | | |
-| 5.1 | Listar con métricas (items, valor, alertas abiertas) | ✅ | ❌ | |
-| 5.2 | CRUD admin | ✅ | ❌ | DELETE bloqueado si hay stock |
+| 5.1 | Listar con métricas (items, valor, alertas abiertas) | ✅ | ✅ | WarehousesPage con cards + drill al inventario |
+| 5.2 | CRUD admin | ✅ | ❌ | UI de creación/edición pendiente (Bloque diferido) |
 | **Stock** | | | | |
-| 6.1 | Listar stock por almacén | ✅ | ❌ | |
-| 6.2 | Valorización por categoría | ✅ | ❌ | |
+| 6.1 | Listar stock por almacén | ✅ | ✅ | InventoryPage con tabla + filtros (categoría, bajo reorden, negativos) |
+| 6.2 | Valorización por categoría | ✅ | ✅ | Sección dentro de InventoryPage con grand total |
 | 6.3 | Días de cobertura | 🟡 | ❌ | Datos denormalizados existen, falta job nocturno que llame `recalc_avg_daily_consumption()` |
 | **Movements** | | | | |
 | 7.1 | Compra (PURCHASE) con weighted average | ✅ | ❌ | Trigger DB recalcula `avg_unit_cost` |
@@ -381,9 +381,9 @@ Brasa Brava es un **sistema de inventario y auditoría para una operación de pa
 
 ### Fase 3 — Inventario (en curso)
 
-**Estado:** Bloques 1-3 completos. Bloques 4-7 pendientes.
+**Estado:** Bloques 1-4 completos. Bloques 5-7 pendientes.
 
-#### Bloque 4 — Frontend warehouses + inventario
+#### Bloque 4 — Frontend warehouses + inventario ✅ CERRADO 2026-04-27
 
 **Objetivo:** que el operario pueda ver stock por almacén y la valorización total sin tocar curl.
 
@@ -562,16 +562,20 @@ Modelos nuevos: `suppliers`, `purchase_orders`, `purchase_order_lines`, `receipt
 
 ---
 
-## 9. Decisiones operativas pendientes (input del PO)
+## 9. Decisiones operativas (PO)
 
-Antes de arrancar Bloque 4 de Fase 3 necesito confirmación sobre:
+### Resueltas
 
-| # | Decisión | Default propuesto |
+| # | Decisión | Resolución (2026-04-27) |
 |---|---|---|
-| **F3-D1** | ¿`react-hook-form` ya o seguimos con `useState` y migramos al final? | RHF ya — reduce reescritura después |
-| **F3-D2** | ¿Bloque 5 hace los 5 tipos de movement en este sprint o solo PURCHASE+CONSUMPTION primero? | Los 5 — es el mismo patrón, mejor cerrar |
-| **F3-D3** | ¿Service events (Bloque 6) entra en Fase 3 o se difiere a Fase 4 con auditorías? | Diferir a Fase 4 — Fase 3 ya es densa, ServiceEvent sin auto-consume aporta poco valor inmediato |
-| **F4-D1** | ¿Reporte P&L exporta a PDF, XLSX, o ambos? | Ambos (uso interno + envío a contador) |
+| **F3-D1** | ¿`react-hook-form` ya o seguimos con `useState`? | ✅ RHF ya — se introduce en Bloque 5 con LoginPage como primer migrador |
+| **F3-D2** | ¿Bloque 5 hace los 5 movements de una o solo PURCHASE+CONSUMPTION? | ✅ Los 5 — orden: PURCHASE → CONSUMPTION/WASTE/ADJUSTMENT (paralelo) → TRANSFER al final |
+| **F3-D3** | ¿Service events en Fase 3 o se difiere a Fase 4? | ✅ Diferir a Fase 4 — pareado con auditorías cuando tenga utilidad real |
+| **F4-D1** | ¿Reporte P&L exporta PDF, XLSX, o ambos? | ✅ Ambos — XLSX primero (uso del contador), PDF después como polish |
+
+### Pendientes
+
+_(ninguna por ahora — agregar acá si surge algo durante Bloque 5)_
 
 ---
 
