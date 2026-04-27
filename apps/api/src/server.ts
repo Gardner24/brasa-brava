@@ -2,7 +2,7 @@
  * Composición del servidor: registra plugins en orden, ensambla rutas.
  * Devuelve la instancia de Fastify lista para `listen()`.
  */
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify from 'fastify';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
@@ -23,7 +23,10 @@ import { recipeRoutes } from './infrastructure/http/routes/recipe.routes.js';
 import { categoryRoutes } from './infrastructure/http/routes/category.routes.js';
 import { auditLogRoutes } from './infrastructure/http/routes/audit-log.routes.js';
 
-export async function buildServer(env: Env): Promise<FastifyInstance> {
+// Return type intencionalmente inferido — Fastify cambia el tipo del server
+// según las opciones (HTTP/2, etc.) y forzar FastifyInstance genérico genera
+// TS2769 por desajuste con Http2SecureServer.
+export async function buildServer(env: Env) {
   const app = Fastify({
     logger: {
       level: env.LOG_LEVEL,

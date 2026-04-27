@@ -2,13 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
     "types": ["node"],
+    "baseUrl": ".",
     "paths": {
       "@brasa/db": ["../../packages/db/src/index.ts"],
       "@brasa/shared-types": ["../../packages/shared-types/src/index.ts"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../packages/db/src/**/*", "../../packages/shared-types/src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]
 }

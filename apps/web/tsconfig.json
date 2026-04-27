@@ -9,10 +9,11 @@
     "noEmit": true,
     "useDefineForClassFields": true,
     "types": ["vite/client"],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@brasa/shared-types": ["../../packages/shared-types/src/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../../packages/shared-types/src/**/*"]
 }
