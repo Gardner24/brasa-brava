@@ -1,0 +1,77 @@
+{
+  "title": "Movements",
+  "subtitle": "Ledger — all stock ins and outs",
+  "registerCta": "Register movement",
+  "registerTitle": "Register movement",
+  "registerSub": "Select the type and fill the data",
+  "tabs": {
+    "purchase": "Purchase",
+    "consumption": "Consumption",
+    "waste": "Waste",
+    "transfer": "Transfer",
+    "adjustment": "Adjustment"
+  },
+  "fields": {
+    "product": "Product",
+    "warehouse": "Warehouse",
+    "fromWarehouse": "From warehouse",
+    "toWarehouse": "To warehouse",
+    "qty": "Quantity",
+    "unitCost": "Unit cost (₡)",
+    "wasteReason": "Reason",
+    "notes": "Notes",
+    "notesRequired": "Notes (required for adjustments)",
+    "performedAt": "Date (optional, default: now)",
+    "selectProduct": "Select a product",
+    "selectWarehouse": "Select a warehouse",
+    "selectReason": "Select a reason"
+  },
+  "wasteReasons": {
+    "EXPIRED": "Expired",
+    "SPOILED": "Spoiled",
+    "DAMAGED": "Damaged",
+    "PREP_LOSS": "Prep loss",
+    "CUSTOMER_RETURN": "Customer return",
+    "OTHER": "Other"
+  },
+  "movementType": {
+    "PURCHASE": "Purchase",
+    "CONSUMPTION": "Consumption",
+    "TRANSFER_IN": "Transfer (in)",
+    "TRANSFER_OUT": "Transfer (out)",
+    "ADJUSTMENT": "Adjustment",
+    "WASTE": "Waste",
+    "RETURN": "Return",
+    "INITIAL": "Initial balance"
+  },
+  "filters": {
+    "title": "Filters",
+    "warehouse": "Warehouse",
+    "allWarehouses": "All warehouses",
+    "type": "Type",
+    "allTypes": "All types",
+    "fromDate": "From",
+    "toDate": "To"
+  },
+  "cols": {
+    "date": "Date",
+    "type": "Type",
+    "product": "Product",
+    "warehouse": "Warehouse",
+    "qty": "Quantity",
+    "unitCost": "Unit cost",
+    "totalValue": "Value",
+    "notes": "Notes"
+  },
+  "actions": {
+    "submit": "Register",
+    "cancel": "Cancel"
+  },
+  "empty": "No movements registered with these filters.",
+  "transferSameWarehouse": "Source and target warehouses must be different.",
+  "successPurchase": "Purchase registered — {{qty}} {{unit}} of {{name}}",
+  "successConsumption": "Consumption registered — {{qty}} {{unit}} of {{name}}",
+  "successWaste": "Waste registered — {{qty}} {{unit}} of {{name}}",
+  "successTransfer": "Transfer registered — {{qty}} {{unit}} of {{name}}",
+  "successAdjustment": "Adjustment registered — {{qty}} {{unit}} of {{name}}"
+}

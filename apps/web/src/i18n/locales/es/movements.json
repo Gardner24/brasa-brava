@@ -1,0 +1,77 @@
+{
+  "title": "Movimientos",
+  "subtitle": "Libro mayor — todas las entradas y salidas de stock",
+  "registerCta": "Registrar movimiento",
+  "registerTitle": "Registrar movimiento",
+  "registerSub": "Selecciona el tipo y completa los datos",
+  "tabs": {
+    "purchase": "Compra",
+    "consumption": "Consumo",
+    "waste": "Merma",
+    "transfer": "Transferencia",
+    "adjustment": "Ajuste"
+  },
+  "fields": {
+    "product": "Producto",
+    "warehouse": "Almacén",
+    "fromWarehouse": "Almacén origen",
+    "toWarehouse": "Almacén destino",
+    "qty": "Cantidad",
+    "unitCost": "Costo unitario (₡)",
+    "wasteReason": "Razón",
+    "notes": "Notas",
+    "notesRequired": "Notas (obligatorio para ajustes)",
+    "performedAt": "Fecha (opcional, default: ahora)",
+    "selectProduct": "Selecciona un producto",
+    "selectWarehouse": "Selecciona un almacén",
+    "selectReason": "Selecciona una razón"
+  },
+  "wasteReasons": {
+    "EXPIRED": "Vencido",
+    "SPOILED": "Echado a perder",
+    "DAMAGED": "Dañado",
+    "PREP_LOSS": "Pérdida de prep.",
+    "CUSTOMER_RETURN": "Devolución cliente",
+    "OTHER": "Otro"
+  },
+  "movementType": {
+    "PURCHASE": "Compra",
+    "CONSUMPTION": "Consumo",
+    "TRANSFER_IN": "Transferencia (in)",
+    "TRANSFER_OUT": "Transferencia (out)",
+    "ADJUSTMENT": "Ajuste",
+    "WASTE": "Merma",
+    "RETURN": "Devolución",
+    "INITIAL": "Saldo inicial"
+  },
+  "filters": {
+    "title": "Filtros",
+    "warehouse": "Almacén",
+    "allWarehouses": "Todos los almacenes",
+    "type": "Tipo",
+    "allTypes": "Todos los tipos",
+    "fromDate": "Desde",
+    "toDate": "Hasta"
+  },
+  "cols": {
+    "date": "Fecha",
+    "type": "Tipo",
+    "product": "Producto",
+    "warehouse": "Almacén",
+    "qty": "Cantidad",
+    "unitCost": "Costo unit.",
+    "totalValue": "Valor",
+    "notes": "Notas"
+  },
+  "actions": {
+    "submit": "Registrar",
+    "cancel": "Cancelar"
+  },
+  "empty": "No hay movimientos registrados con estos filtros.",
+  "transferSameWarehouse": "El almacén origen y destino deben ser distintos.",
+  "successPurchase": "Compra registrada — {{qty}} {{unit}} de {{name}}",
+  "successConsumption": "Consumo registrado — {{qty}} {{unit}} de {{name}}",
+  "successWaste": "Merma registrada — {{qty}} {{unit}} de {{name}}",
+  "successTransfer": "Transferencia registrada — {{qty}} {{unit}} de {{name}}",
+  "successAdjustment": "Ajuste registrado — {{qty}} {{unit}} de {{name}}"
+}

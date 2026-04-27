@@ -21,6 +21,13 @@ import type {
   ListStockQuery,
   LowStockAlertDTO,
   ListAlertsQuery,
+  StockMovementDTO,
+  ListMovementsQuery,
+  PurchaseMovementRequest,
+  ConsumptionMovementRequest,
+  WasteMovementRequest,
+  TransferMovementRequest,
+  AdjustmentMovementRequest,
 } from '@brasa/shared-types';
 import { api } from './api.ts';
 
@@ -38,6 +45,7 @@ export const qk = {
   stock: (q: ListStockQuery) => ['stock', q] as const,
   stockValuation: (warehouseId: string) => ['stock', 'valuation', warehouseId] as const,
   alerts: (q?: Partial<ListAlertsQuery>) => ['alerts', q ?? {}] as const,
+  movements: (q?: Partial<ListMovementsQuery>) => ['movements', q ?? {}] as const,
 };
 
 // ===== Helpers =====
@@ -181,5 +189,82 @@ export function useResolveAlert() {
       qc.invalidateQueries({ queryKey: ['alerts'] });
       qc.invalidateQueries({ queryKey: ['warehouses'] });
     },
+  });
+}
+
+// ===== Movements =====
+export function useMovements(query: Partial<ListMovementsQuery> = {}) {
+  return useQuery({
+    queryKey: qk.movements(query),
+    queryFn: () => api<Paginated<StockMovementDTO>>(`/movements${qs(query)}`),
+    placeholderData: keepPreviousData,
+  });
+}
+
+function invalidateAfterMovement(qc: ReturnType<typeof useQueryClient>): void {
+  qc.invalidateQueries({ queryKey: ['stock'] });
+  qc.invalidateQueries({ queryKey: ['warehouses'] });
+  qc.invalidateQueries({ queryKey: ['movements'] });
+  qc.invalidateQueries({ queryKey: ['alerts'] });
+  qc.invalidateQueries({ queryKey: ['products'] });
+}
+
+export function useRegisterPurchase() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: PurchaseMovementRequest) =>
+      api<StockMovementDTO>('/movements/purchase', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => invalidateAfterMovement(qc),
+  });
+}
+
+export function useRegisterConsumption() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ConsumptionMovementRequest) =>
+      api<StockMovementDTO>('/movements/consumption', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => invalidateAfterMovement(qc),
+  });
+}
+
+export function useRegisterWaste() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: WasteMovementRequest) =>
+      api<StockMovementDTO>('/movements/waste', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => invalidateAfterMovement(qc),
+  });
+}
+
+export function useRegisterTransfer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: TransferMovementRequest) =>
+      api<{ outMovement: StockMovementDTO; inMovement: StockMovementDTO }>(
+        '/movements/transfer',
+        { method: 'POST', body: JSON.stringify(body) },
+      ),
+    onSuccess: () => invalidateAfterMovement(qc),
+  });
+}
+
+export function useRegisterAdjustment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: AdjustmentMovementRequest) =>
+      api<StockMovementDTO>('/movements/adjustment', {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => invalidateAfterMovement(qc),
   });
 }

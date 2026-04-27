@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/select.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge, categoryVariant } from '@/components/ui/badge.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
+import { RegisterMovementDrawer } from '@/components/movements/RegisterMovementDrawer.tsx';
 import {
   useCategories,
   useStock,
@@ -25,6 +26,8 @@ export function InventoryPage() {
   const [categoryCode, setCategoryCode] = useState<string>('');
   const [belowReorderOnly, setBelowReorderOnly] = useState(false);
   const [negativeOnly, setNegativeOnly] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerProductId, setDrawerProductId] = useState<string | undefined>(undefined);
 
   const warehouses = useWarehouses();
   const categories = useCategories();
@@ -69,7 +72,13 @@ export function InventoryPage() {
               : t('inventory.subtitle')}
           </p>
         </div>
-        <Button disabled={!activeWarehouseId}>
+        <Button
+          disabled={!activeWarehouseId}
+          onClick={() => {
+            setDrawerProductId(undefined);
+            setDrawerOpen(true);
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" />
           {t('inventory.registerMovement')}
         </Button>
@@ -194,7 +203,14 @@ export function InventoryPage() {
                 ))
               ) : stock.data && stock.data.length > 0 ? (
                 stock.data.map((row) => (
-                  <tr key={row.productId} className="border-b hover:bg-muted/40">
+                  <tr
+                    key={row.productId}
+                    className="cursor-pointer border-b hover:bg-muted/40"
+                    onClick={() => {
+                      setDrawerProductId(row.productId);
+                      setDrawerOpen(true);
+                    }}
+                  >
                     <td className="px-4 py-3 font-mono text-xs">{row.productSku}</td>
                     <td className="px-4 py-3">{row.productName[locale] ?? row.productName.es}</td>
                     <td className="px-4 py-3">
@@ -252,6 +268,13 @@ export function InventoryPage() {
           </Button>
         </div>
       </Card>
+
+      <RegisterMovementDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        defaultProductId={drawerProductId}
+        defaultWarehouseId={activeWarehouseId || undefined}
+      />
     </div>
   );
 }
