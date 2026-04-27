@@ -4,7 +4,7 @@
  * Una sola query con LEFT JOIN al producto para incluir denormalizados de
  * consumption (last_consumption_at, avg_daily_consumption).
  */
-import type { Prisma } from '@brasa/db';
+import { Prisma } from '@brasa/db';
 import type { ListStockQuery, StockLevelDTO } from '@brasa/shared-types';
 
 interface RawRow {
